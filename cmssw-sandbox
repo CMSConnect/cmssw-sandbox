@@ -23,7 +23,7 @@ def release2filename(rel):
     """
     p = os.path.abspath(os.path.expandvars(os.path.expanduser(rel)))
     v = os.path.split(p)[1]
-    return "sandbox-{v}-{d}.tar.bz2".format(v=v, d=hashlib.sha1(p).hexdigest()[:7])
+    return "sandbox-{v}-{d}.tar.bz2".format(v=v, d=hashlib.sha1(p.encode()).hexdigest()[:7])
 
 
 def dontpack(fn):
@@ -42,13 +42,13 @@ def getversion(sandbox):
         logger.info("Could not get cmssw release version. Is this a cmssw sandbox?")
         return
 
-    print "Using CMSSW {0}".format(rtname)
+    print("Using CMSSW {0}".format(rtname))
     return
 
 def package(indir, outdir, blacklist=None, update=False, include_all=False, include_dir=None):
     if blacklist is None:
         blacklist = []
-    # print "Blacklist: type={0}, content={1}".format(type(blacklist), blacklist)
+    # print("Blacklist: type={0}, content={1}".format(type(blacklist), blacklist))
 
     rtname = os.path.split(os.path.normpath(indir))[1]
     outfile = os.path.join(outdir, release2filename(indir))
@@ -143,4 +143,8 @@ if __name__ == "__main__":
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
-    args.func(args)
+    try:
+        func = args.func
+    except AttributeError:
+        parser.error("too few arguments.Try: cmssw-sandbox --help")
+    func(args)
