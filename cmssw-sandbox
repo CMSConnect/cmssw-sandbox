@@ -64,8 +64,8 @@ def package(indir, outdir, blacklist=None, update=False, include_all=False, incl
     def ignore_file(fn):
         for test in blacklist:
             if fnmatch.fnmatch(os.path.split(fn)[1], test):
-                return True
-        return False
+                return None
+        return fn
 
     logger.info("packing sandbox into {0}".format(outfile))
     logger.debug("using release name {1} with base directory {0}".format(indir, rtname))
@@ -101,7 +101,7 @@ def package(indir, outdir, blacklist=None, update=False, include_all=False, incl
         outname = os.path.join(rtname, sandboxname)
         logger.debug("packing {0}".format(subdir))
 
-        tarball.add(inname, outname, exclude=ignore_file)
+        tarball.add(inname, outname, filter=ignore_file)
 
     tarball.close()
 
